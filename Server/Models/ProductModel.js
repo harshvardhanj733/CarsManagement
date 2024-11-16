@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const ProductSchema = new mongoose.Schema(
   {
@@ -14,7 +14,7 @@ const ProductSchema = new mongoose.Schema(
         type: [String],
         required: [true, "Atleast One Tag is Required"]
     },
-    image: {
+    images: {
       type: [String],
     //   required: [true, "Atleast One Image is Required"],
     },
@@ -27,6 +27,6 @@ const ProductSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
-const ProductModel = mongoose.model("Product", ProductSchema);
+const Product = mongoose.model("Product", ProductSchema);
 
-export default ProductModel
+export default Product

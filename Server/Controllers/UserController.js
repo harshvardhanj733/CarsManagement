@@ -1,8 +1,14 @@
-import UserModel from "../Models/UserModel";
-const bcrypt = require("bcrypt");
+import User from "../Models/UserModel.js";
+import bcrypt from 'bcrypt'
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv';
+
+dotenv.config();
+
+const key = process.env.KEY
 
 //Register/Create User
-exports.RegisterUser = async (req, res) => {
+const RegisterUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
 
@@ -15,7 +21,7 @@ exports.RegisterUser = async (req, res) => {
     }
 
     //Handling exisiting user
-    const exisitingUser = await userModel.findOne({ email });
+    const exisitingUser = await User.findOne({ email });
     if (exisitingUser) {
       return res.status(401).send({
         success: false,
@@ -30,7 +36,7 @@ exports.RegisterUser = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     //Saving the new user in MongoDB Atlas database
-    const user = new UserModel({ username, email, password: hashedPassword });
+    const user = new User({ username, email, password: hashedPassword });
     await user.save();
     return res.status(200).send({
       success: true,
@@ -48,7 +54,7 @@ exports.RegisterUser = async (req, res) => {
 };
 
 //Login User
-exports.LoginUser = async (req, res) => {
+const LoginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
 
@@ -61,7 +67,7 @@ exports.LoginUser = async (req, res) => {
     }
 
     //Handling Incorrect Email
-    const user = await UserModel.findOne({ email });
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(400).send({
         success: false,
@@ -79,10 +85,14 @@ exports.LoginUser = async (req, res) => {
     }
 
     //User Logged in Successfully
+
+    const token = jwt.sign(user.username, key);
+
     return res.status(200).send({
       success: true,
-      messgae: `Username ${username} Logged In Successfully`,
+      messgae: `Username ${user.username} Logged In Successfully`,
       user,
+      token
     });
   } catch (error) {
     console.log(error);
@@ -93,3 +103,5 @@ exports.LoginUser = async (req, res) => {
     });
   }
 };
+
+export {RegisterUser, LoginUser}

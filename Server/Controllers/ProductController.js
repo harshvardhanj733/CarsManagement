@@ -1,145 +1,100 @@
-const mongoose = require("mongoose");
-import ProductModel from "../Models/ProductModel.js";
-import UserModel from "../Models/UserModel.js";
+import Product from "../Models/ProductModel.js";
 
 //Get All Products
-exports.GetAllProducts = async (req, res) => {
-  try {
-
-  } catch (error) {
-    
-  }
+const GetAllProducts = async (req, res) => {
+    try {
+        const products = await Product.find({}).populate("user");
+        if (!products) {
+          return res.status(200).send({
+            success: false,
+            message: "No Products Found",
+          });
+        }
+        return res.status(200).send({
+          success: true,
+          ProductsCount: products.length,
+          message: "All Products Lists",
+          products,
+        });
+      } catch (error) {
+        console.log(error);
+        return res.status(500).send({
+          success: false,
+          message: "Error While Getting Blogs",
+          error,
+        });
+      }
 };
 
 //Get a User's Products
-exports.GetMyProducts = async (req, res) => {
-  try {
-    
-  } catch (error) {
-    
-  }
+const GetMyProducts = async (req, res) => {
+    try {
+        const user = req.user;
+        // const token = req.header("Authorization").split(' ')[1];
+        const products = await Product.find({ user });
+        return res.status(200).send({
+            success: true,
+            ProductsCount: products.length,
+            message: "My Products Lists",
+            products,
+          });
+
+    } catch (err) {
+        return res.status(500).send(err);
+    }
 };
 
 //Create a New Product
-exports.CreateProduct = async (req, res) => {
-  try {
-    
-  } catch (error) {
-    
-  }
-};
-
-
-//SIngle Blog
-exports.UpdateProduct = async (req, res) => {
-  try {
-    
-  } catch (error) {
-    
-  }
-};
-
-//Delete Blog
-exports.DeleteProduct = async (req, res) => {
-  try {
-    
-  } catch (error) {
-    
-  }
-};
-
-const auth = async (req, res, next) => {
+const CreateProduct = async (req, res) => {
     try {
-        const encryptedToken = req.header("Authorization").split(' ')[1];
-        // const encryptedToken = req.cookie('token');
-        const username = jwt.verify(encryptedToken, key);
-        if (!username) {
-            return res.status(404).send({ message: "Forbidden" });
+        let user = req.user;
+        let { title, description, tags, images } = req.body;
+        console.log(images)
+        const product = new Product({ user, title, description, tags, images });
+        await product.save();
+        return res.status(200).send({
+            success: true,
+            message: "Product Added Successfully",
+            product,
+          });
+
+    } catch (err) {
+        return res.status(500).send({ err });
+    }
+};
+
+//Update a Product
+const UpdateProduct = async (req, res) => {
+    try {
+        const user = req.user;
+        const updateProduct = await Product.findByIdAndUpdate(req.params.product, {title: req.body.title, description: req.body.description,
+            tags: req.body.tags, images: req.body.images, user
+        }, {new: true});
+        if(!updateProduct){
+            return res.status(404).send({ error: 'Product Not Found' });
         }
+        return res.status(200).send({ updateProduct });
 
-        const user = await Signup.findOne({ username });
-        if (!user) {
-            return res.status(401).send({ message: "Forbidden" });
-        }
-        req.user = username;
-        next();
-
-    } catch (err) {
-        return res.status(500).send({ err });
+    } catch (error) {
+        return res.status(500).json({ error: 'Server Error while Deleting Product. Kindly Try Again Later' });
     }
-}
+};
 
-app.get('/api/todos/dashboard', auth, async (req, res) => {
-    const username = req.user;
+//Delete a Product
+const DeleteProduct = async (req, res) => {
     try {
+        const deleteProduct = await Product.findByIdAndDelete(req.params.product);
 
-        const token = req.header("Authorization").split(' ')[1];
-        const data = await ToDos.find({ username });
-        return res.status(200).send({data});
-
-    } catch (err) {
-        return res.status(500).send({ err });
-    }
-})
-
-app.post('/api/todos/newTodo', auth, async (req, res) => {
-    let username = req.user;
-    let { title, description, status } = req.body;
-
-    try {
-
-        const data = new ToDos({ username, title, description, status });
-        await data.save();
-        return res.status(200).send({data});
-
-    } catch (err) {
-        return res.status(500).send({ err });
-    }
-})
-
-app.delete('/api/todos/deleteTodo/:todo', auth, async (req, res) => {
-    try {
-        const deletedToDo = await ToDos.findByIdAndDelete(req.params.todo);
-
-        if (!deletedToDo) {
+        if (!deleteProduct) {
             // If `deletedToDo` is null, the document with the specified ID was not found
-            return res.status(404).json({ error: 'Todo not found' });
+            return res.status(404).json({ error: 'Product not found' });
         }
 
-        return res.status(200).send({ deletedToDo });
+        return res.status(200).send({ deleteProduct, message: "Product Deleted Successfully" });
 
     } catch (error) {
-        return res.status(500).json({ error: 'Server error' });
+        return res.status(500).json({ error: 'Server Error while Deleting Product. Kindly Try Again Later' });
     }
-});
+};
 
-app.put('/api/todos/updateTodo/:todo', auth, async (req, res)=>{
-    try {
-        
-        const updatedToDo = await ToDos.findByIdAndUpdate(req.params.todo, req.body, {new: true});
-
-        if(!updatedToDo){
-            return res.status(404).send({error: 'ToDo not found'});
-        }
-
-        return res.status(200).send({updatedToDo});
-
-    } catch (error) {
-
-        return res.status(500).json({error});
-        
-    }
-})
-
-app.patch('/api/todos/statusTodo/:todo', auth, async (req, res) => {
-    try {
-        const statusToDo = await ToDos.findByIdAndUpdate(req.params.todo, { $set: { status: !req.body.status } }, {new: true});
-        if(!statusToDo){
-            return res.status(404).send({error: 'ToDo not found'});
-        }
-        return res.status(200).send({statusToDo});
-    } 
-    catch (error) {
-        return res.status(500).json({error});
-    }
-})
+export {GetAllProducts, GetMyProducts, CreateProduct, UpdateProduct, DeleteProduct};

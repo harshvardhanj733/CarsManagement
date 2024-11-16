@@ -1,173 +1,26 @@
 import express from 'express'
 import cors from 'cors'
-import bcrypt from 'bcrypt'
-import jwt from 'jsonwebtoken'
 import dotenv from 'dotenv'
 import db from './db.js'
+import UserRouter from './Routes/UserRoute.js'
+import ProductRouter from './Routes/ProductRoute.js'
 
 const port = 80;
 // const key = process.env.KEY;
 
 const app = express();
 
-app.use(express.urlencoded({ extended: true })); //for MongoDB
-app.use(express.json());
+app.use(express.urlencoded({ extended: true, limit: "50mb" })); //for MongoDB
+app.use(express.json({ limit: "50mb" }));
 app.use(cors())
+app.options('*', cors())
 
 dotenv.config()
 db();
 
-
-
-// app.post('/api/signup', async (req, res) => {
-//     let { username, email, password, confirmPassword } = req.body;
-//     try {
-//         let user = await Signup.findOne({ $or: [{ username }, { email }] });
-//         if (user) {
-//             res.status(403).send({ message: "User Already Exists" })
-//         }
-//         else if (password === confirmPassword) {
-//             const salt = await bcrypt.genSalt(10);
-//             const secPass =  await bcrypt.hash(password, salt);
-
-//             user = new Signup({ username, email, password: secPass });
-//             await user.save();
-
-//             res.status(200).send({ message: "User Created Sucessfully!", username });
-//         }
-//         else {
-//             res.status(403).send({ message: "Passwords Don't Match" });
-//         }
-//     } catch (err) {
-//         console.log(err);
-//         res.status(500).send(err);
-//     }
-// })
-
-
-// app.post('/api/login', async (req, res) => {
-//     const { username, password } = req.body;
-//     try {
-
-//         let user = await Signup.findOne({ username });
-//         if (!user) {
-//             return res.status(403).send({ message: "Incorrect username or password" });
-//         }
-
-//         let passCheck = await bcrypt.compare(password, user.password);
-//         if (!passCheck) {
-//             return res.status(403).send({ message: "Incorrect username or password" });
-//         }
-
-//         const token = jwt.sign(username, key);
-//         // res.cookie('token', 'token', {httpOnly:true, expires: new Date(Date.now() + 25892000000), path:'/'});
-//         res.status(200).send({ message: "Logged in Successfully", token });
-
-
-//     } catch (err) {
-//         console.log(err)
-//         res.status(500).send({ err });
-//     }
-// })
-
-
-// const auth = async (req, res, next) => {
-//     try {
-//         const encryptedToken = req.header("Authorization").split(' ')[1];
-//         // const encryptedToken = req.cookie('token');
-//         const username = jwt.verify(encryptedToken, key);
-//         if (!username) {
-//             return res.status(404).send({ message: "Forbidden" });
-//         }
-
-//         const user = await Signup.findOne({ username });
-//         if (!user) {
-//             return res.status(401).send({ message: "Forbidden" });
-//         }
-//         req.user = username;
-//         next();
-
-//     } catch (err) {
-//         return res.status(500).send({ err });
-//     }
-// }
-
-// app.get('/api/todos/dashboard', auth, async (req, res) => {
-//     const username = req.user;
-//     try {
-
-//         const token = req.header("Authorization").split(' ')[1];
-//         const data = await ToDos.find({ username });
-//         return res.status(200).send({data});
-
-//     } catch (err) {
-//         return res.status(500).send({ err });
-//     }
-// })
-
-// app.post('/api/todos/newTodo', auth, async (req, res) => {
-//     let username = req.user;
-//     let { title, description, status } = req.body;
-
-//     try {
-
-//         const data = new ToDos({ username, title, description, status });
-//         await data.save();
-//         return res.status(200).send({data});
-
-//     } catch (err) {
-//         return res.status(500).send({ err });
-//     }
-// })
-
-// app.delete('/api/todos/deleteTodo/:todo', auth, async (req, res) => {
-//     try {
-//         const deletedToDo = await ToDos.findByIdAndDelete(req.params.todo);
-
-//         if (!deletedToDo) {
-//             // If `deletedToDo` is null, the document with the specified ID was not found
-//             return res.status(404).json({ error: 'Todo not found' });
-//         }
-
-//         return res.status(200).send({ deletedToDo });
-
-//     } catch (error) {
-//         return res.status(500).json({ error: 'Server error' });
-//     }
-// });
-
-// app.put('/api/todos/updateTodo/:todo', auth, async (req, res)=>{
-//     try {
-        
-//         const updatedToDo = await ToDos.findByIdAndUpdate(req.params.todo, req.body, {new: true});
-
-//         if(!updatedToDo){
-//             return res.status(404).send({error: 'ToDo not found'});
-//         }
-
-//         return res.status(200).send({updatedToDo});
-
-//     } catch (error) {
-
-//         return res.status(500).json({error});
-        
-//     }
-// })
-
-// app.patch('/api/todos/statusTodo/:todo', auth, async (req, res) => {
-//     try {
-//         const statusToDo = await ToDos.findByIdAndUpdate(req.params.todo, { $set: { status: !req.body.status } }, {new: true});
-//         if(!statusToDo){
-//             return res.status(404).send({error: 'ToDo not found'});
-//         }
-//         return res.status(200).send({statusToDo});
-//     } 
-//     catch (error) {
-//         return res.status(500).json({error});
-//     }
-// })
-
-
+//routes
+app.use('/api/user', UserRouter)
+app.use('/api/product', ProductRouter)
 
 app.listen(port, () => {
     console.log(`Server Running Successfully on http://localhost:${port}`);
