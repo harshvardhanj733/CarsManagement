@@ -6,16 +6,16 @@ const AddCars = ({ token, setMyCars }) => {
   const [description, setDescription] = useState("");
   const [tags, setTags] = useState("");
   const [images, setImages] = useState([]);
-
-  const navigate = useNavigate()
+  const [addbuttonText, setAddButtonText] = useState("Add Car");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    addCar()
-    
+    addCar();
   };
 
   const addCar = async () => {
+    setAddButtonText("Just a min..");
     try {
       const carData = {
         title: carTitle,
@@ -23,14 +23,17 @@ const AddCars = ({ token, setMyCars }) => {
         tags: tags.split(",").map((tag) => tag.trim()),
         images,
       };
-      let result = await fetch('http://localhost:80/api/product/create-product', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json', // Specify JSON format
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(carData)
-      })
+      let result = await fetch(
+        "http://localhost:80/api/product/create-product",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json", // Specify JSON format
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(carData),
+        }
+      );
       result = await result.json();
 
       if (result.success) {
@@ -40,24 +43,24 @@ const AddCars = ({ token, setMyCars }) => {
         setDescription("");
         setTags("");
         setImages([]);
-        navigate('/dashboard/my-cars')
+        navigate("/dashboard/my-cars");
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
-  function convertToBase64(file){
+  function convertToBase64(file) {
     return new Promise((resolve, reject) => {
       const fileReader = new FileReader();
       fileReader.readAsDataURL(file);
       fileReader.onload = () => {
-        resolve(fileReader.result)
+        resolve(fileReader.result);
       };
       fileReader.onerror = (error) => {
-        reject(error)
-      }
-    })
+        reject(error);
+      };
+    });
   }
 
   const handleImageChange = (e) => {
@@ -66,11 +69,13 @@ const AddCars = ({ token, setMyCars }) => {
       alert("You can only upload up to 10 images.");
       return;
     }
-    files.map(async(file)=>{
+    files.map(async (file) => {
       const base64 = await convertToBase64(file);
-      console.log(base64)
-      setImages((images)=>{ return [ ...images, base64 ]})
-    })
+      console.log(base64);
+      setImages((images) => {
+        return [...images, base64];
+      });
+    });
     // setImages(files);
   };
 
@@ -140,7 +145,7 @@ const AddCars = ({ token, setMyCars }) => {
             type="submit"
             className="w-1/3 py-3 px-4 bg-teal-700 text-white font-semibold rounded-lg hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:ring-opacity-50 mx-auto"
           >
-            Add Car
+            {addbuttonText}
           </button>
         </div>
       </form>

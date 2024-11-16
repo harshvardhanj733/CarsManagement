@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 const Login = ({ onLogin, setToken }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,21 +25,22 @@ const Login = ({ onLogin, setToken }) => {
     //   return;
     // }
 
-    let result = await fetch('http://localhost:80/api/user/login-user', {
-      method: 'POST',
+    let result = await fetch("http://localhost:80/api/user/login-user", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json', // Specify JSON format
+        "Content-Type": "application/json", // Specify JSON format
       },
-      body: JSON.stringify({ email, password })
-    })
-    result = await result.json()
+      body: JSON.stringify({ email, password }),
+    });
+    result = await result.json();
+    if (result.message) toast(result.message);
+
     if (result.success) {
-      onLogin()
-      setToken(result.token)
+      onLogin();
+      setToken(result.token);
       navigate("/dashboard");
-    }
-    else{
-      setError("Please Fill all the fields correctly")
+    } else {
+      setError("Please Fill all the fields correctly");
     }
 
     // setLoading(true);

@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
 
 const Register = () => {
   const [email, setEmail] = useState("");
@@ -8,22 +9,24 @@ const Register = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  const url = 'http://localhost:80'
+  const url = "http://localhost:80";
 
   const handleSubmit = async (e) => {
-
     e.preventDefault();
 
     if (email && password && username) {
-      let result = await fetch('http://localhost:80/api/user/register-user', {
-        method: 'POST',
+      let result = await fetch("http://localhost:80/api/user/register-user", {
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json', // Specify JSON format
+          "Content-Type": "application/json", // Specify JSON format
         },
-        body: JSON.stringify({username, email, password})
-      })
-      result = await result.json()
-      if(result.success){
+        body: JSON.stringify({ username, email, password }),
+      });
+      result = await result.json();
+      console.log(result.message);
+      // setAlert(result.message);
+      if (result.message) toast(result.message);
+      if (result.success) {
         navigate("/login");
       }
     } else {
@@ -33,6 +36,7 @@ const Register = () => {
 
   return (
     <div className="h-screen">
+      <ToastContainer />
       <header className="h-20 bg-gray-800 sm:max-h-20 flex items-center z-30 w-full border-b border-white">
         <div className="container mx-auto px-6 flex items-center justify-between">
           <a

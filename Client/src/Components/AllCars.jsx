@@ -1,24 +1,24 @@
 import { useEffect, useState } from "react";
-
-const AllCars = ({cars, setCars}) => {
-
+import { Swiper, SwiperSlide } from "swiper/react";
+import "swiper/css";
+const AllCars = ({ cars, setCars }) => {
   const getCars = async () => {
     try {
-      let result = await fetch('http://localhost:80/api/product/all-products', {
-        method: 'GET',
+      let result = await fetch("http://localhost:80/api/product/all-products", {
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json', // Specify JSON format
+          "Content-Type": "application/json", // Specify JSON format
         },
-      })
+      });
       result = await result.json();
-  
+
       if (result.success) {
         setCars(result.products);
       }
     } catch (error) {
-      console.log(error)
+      console.log(error);
     }
-  }
+  };
 
   const [selectedCar, setSelectedCar] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
@@ -59,7 +59,8 @@ const AllCars = ({cars, setCars}) => {
 
   useEffect(() => {
     getCars();
-  }, [])
+  }, []);
+  const [alert, setAlert] = useState("");
 
   if (selectedCar) {
     return (
@@ -71,11 +72,29 @@ const AllCars = ({cars, setCars}) => {
           Back to All Cars
         </button>
         <div className="bg-gray-800 rounded-lg shadow-lg overflow-hidden">
-          <img
-            src={selectedCar.images[0]}
-            alt={selectedCar.title}
-            className="w-full h-64 object-cover"
-          />
+          {/* Render all images */}
+          <div className="w-full">
+            <Swiper
+              spaceBetween={50}
+              slidesPerView={1}
+              onSlideChange={() => console.log("slide change")}
+              onSwiper={(swiper) => console.log(swiper)}
+            >
+              {selectedCar.images.map((image, index) => (
+                <SwiperSlide key={index}>
+                  <img
+                    src={image}
+                    alt={`Image ${index + 1} of ${selectedCar.title}`}
+                    className="w-full h-64 object-contain my-14"
+                  />
+                </SwiperSlide>
+              ))}
+            </Swiper>
+            <div className="w-full flex justify-center">
+              <span className="text-white text-2xl"> Swipe to View More</span>
+            </div>
+          </div>
+
           <div className="p-6">
             <h1 className="text-3xl font-semibold text-white mb-4">
               {selectedCar.title}
@@ -98,6 +117,7 @@ const AllCars = ({cars, setCars}) => {
       </div>
     );
   }
+  if (cars.length == 0) return <h1>Loading...</h1>;
 
   return (
     <div className="container mx-auto p-6">
@@ -119,10 +139,11 @@ const AllCars = ({cars, setCars}) => {
             <button
               key={tag}
               onClick={() => handleTagClick(tag)}
-              className={`py-1 px-3 rounded-full text-sm cursor-pointer ${selectedTags.includes(tag)
+              className={`py-1 px-3 rounded-full text-sm cursor-pointer ${
+                selectedTags.includes(tag)
                   ? "bg-teal-500 text-white"
                   : "bg-gray-200 text-gray-800"
-                }`}
+              }`}
             >
               {tag}
             </button>
