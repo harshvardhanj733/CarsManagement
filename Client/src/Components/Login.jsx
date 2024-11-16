@@ -27,11 +27,12 @@ const Login = ({ onLogin }) => {
     setLoading(true);
 
     setTimeout(() => {
+      // I need to change this later and replace if-else parts
       if (email === "test@example.com" && password === "password123") {
+        setError("Invalid email or password.");
+      } else {
         onLogin();
         navigate("/dashboard");
-      } else {
-        setError("Invalid email or password.");
       }
       setLoading(false);
     }, 1000);

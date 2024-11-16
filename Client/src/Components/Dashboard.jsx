@@ -1,4 +1,4 @@
-import { Link, NavLink, Outlet } from "react-router-dom";
+import { NavLink, Outlet } from "react-router-dom";
 
 const Dashboard = ({ onLogout }) => {
   return (
@@ -17,8 +17,8 @@ const Dashboard = ({ onLogout }) => {
                 to="all-cars"
                 className={({ isActive }) =>
                   isActive
-                    ? "py-2 px-6 flex opacity-100 text-teal-700 underline"
-                    : "py-2 px-6 flex opacity-70 hover:text-teal-700"
+                    ? "py-2 px-6 flex opacity-100 text-teal-400 underline"
+                    : "py-2 px-6 flex opacity-70 hover:text-teal-400"
                 }
               >
                 All Cars
@@ -27,8 +27,8 @@ const Dashboard = ({ onLogout }) => {
                 to="my-cars"
                 className={({ isActive }) =>
                   isActive
-                    ? "py-2 px-6 flex opacity-100 text-teal-700 underline"
-                    : "py-2 px-6 flex opacity-70 hover:text-teal-700"
+                    ? "py-2 px-6 flex opacity-100 text-teal-400 underline"
+                    : "py-2 px-6 flex opacity-70 hover:text-teal-400"
                 }
               >
                 My Cars
@@ -37,25 +37,24 @@ const Dashboard = ({ onLogout }) => {
                 to="add-cars"
                 className={({ isActive }) =>
                   isActive
-                    ? "py-2 px-6 flex opacity-100 text-teal-700 underline"
-                    : "py-2 px-6 flex opacity-70 hover:text-teal-700"
+                    ? "py-2 px-6 flex opacity-100 text-teal-400 underline"
+                    : "py-2 px-6 flex opacity-70 hover:text-teal-400"
                 }
               >
                 Add Cars
               </NavLink>
             </nav>
-            <button
-              onClick={onLogout}
-              className="py-2 px-6 flex opacity-70 hover:text-teal-700 cursor-pointer"
-            >
-              Logout
-            </button>
           </div>
+          <button
+            onClick={onLogout}
+            className="py-2 rounded-lg px-6 flex opacity-70 hover:text-gray-50 cursor-pointer bg-teal-200 hover:bg-red-500"
+          >
+            Logout
+          </button>
         </div>
       </header>
 
       <div className="container mx-auto p-6">
-        <h1 className="text-2xl font-bold">Welcome to your Dashboard</h1>
         <Outlet />
       </div>
     </div>

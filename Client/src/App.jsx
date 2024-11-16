@@ -1,4 +1,9 @@
-import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Route,
+  Routes,
+  Navigate,
+} from "react-router-dom";
 import { useState } from "react";
 import HomeSection from "./Components/HomeSection";
 import Login from "./Components/Login";
@@ -32,10 +37,12 @@ const App = () => {
             isLoggedIn ? (
               <Dashboard onLogout={handleLogout} />
             ) : (
-              <Login onLogin={handleLogin} />
+              <Navigate to="/login" />
             )
           }
         >
+          <Route index element={<Navigate to="all-cars" />} />
+
           <Route path="all-cars" element={<AllCars />} />
           <Route path="my-cars" element={<MyCars />} />
           <Route path="add-cars" element={<AddCars />} />
